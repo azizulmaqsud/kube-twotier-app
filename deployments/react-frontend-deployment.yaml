@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: frontend
-                  image: shahedmehbub/feb-23-cicd-frontend
+                  image: azizul2go/two-tier-frontend-image
                   ports:
                     - containerPort: 80
 
