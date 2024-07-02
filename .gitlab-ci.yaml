@@ -1,8 +1,7 @@
-
 stages:
   - build
   - deploy
- 
+
 docker_build_backend:
   stage: build
   image: docker:latest
@@ -10,10 +9,10 @@ docker_build_backend:
     - docker:dind
   script:
     - docker build -t backend backend
-    - docker tag backend azizul2go/two-tier-backend-image:latest
+    - docker tag backend azizul2go/three-tier-backend:latest
     - echo "$DOCKERHUB_PASSWORD" | docker login -u azizul2go --password-stdin
-    - docker push azizul2go/two-tier-backend-image:latest
- 
+    - docker push azizul2go/three-tier-backend:latest
+
 docker_build_frontend:
   stage: build
   image: docker:latest
@@ -21,22 +20,26 @@ docker_build_frontend:
     - docker:dind
   script:
     - docker build -t frontend frontend
-    - docker tag frontend azizul2go/two-tier-frontend-image:v2
+    - docker tag frontend azizul2go/three-tier-frontend:latest
     - echo "$DOCKERHUB_PASSWORD" | docker login -u azizul2go --password-stdin
-    - docker push azizul2go/two-tier-frontend-image:v2
- 
+    - docker push azizul2go/three-tier-frontend:latest
+
 deploy_backend_k8s:
   stage: deploy
   image: bearengineer/awscli-kubectl
   script:
-    - aws eks update-kubeconfig --region us-east-1 --name june-24-eks
-    - kubectl apply -f deployments/backend-deployment.yaml -f deployments/backend-service.yaml
-    - kubectl rollout restart -f deployments/backend-deployment.yaml
- 
+    - export AWS_ACCESS_KEY_ID=
+    - export AWS_SECRET_ACCESS_KEY=
+    - aws eks update-kubeconfig --region us-east-1 --name july-24-eks-1
+    - kubectl apply -f /deployments/python-backend-deployment.yaml
+    - kubectl rollout restart -f /deployments/python-backend-deployment.yaml
+
 deploy_frontend_k8s:
   stage: deploy
   image: bearengineer/awscli-kubectl
   script:
-    - aws eks update-kubeconfig --region us-east-1 --name june-24-eks
-    - kubectl apply -f deployments/frontend-deployment.yaml -f deployments/frontend-service.yaml
-    - kubectl rollout restart -f deployments/frontend-deployment.yaml
+    - export AWS_ACCESS_KEY_ID=
+    - export AWS_SECRET_ACCESS_KEY=
+    - aws eks update-kubeconfig --region us-east-1 --name july-24-eks-1
+    - kubectl apply -f deployments/react-frontend-deployment.yaml 
+    - kubectl rollout restart -f deployments/react-frontend-deployment.yaml 
